@@ -1,0 +1,182 @@
+FUNCTION_BLOCK "FB_P1_Boiler"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+// ============================================================================
+// FB_P1_Boiler: Boiler Process Control (P1)
+// 
+// Control loops:
+// - Pressure Control (PC): PID controlling PCV01/PCV02 valves
+// - Level Control (LC): PID controlling LCV01 valve  
+// - Flow Control (FC): PID controlling FCV03 valve
+// - Temperature Control (TC): Cascade with inner flow loop (FCV01/FCV02)
+// - Cooling Control (CC): Pump PP04 based on temperature window
+// ============================================================================
+
+VAR_INPUT
+    Enable : Bool := TRUE;        // Enable control
+    Reset : Bool := FALSE;        // Reset integrators
+END_VAR
+
+VAR_OUTPUT
+    PC_Active : Bool;             // Pressure control active
+    LC_Active : Bool;             // Level control active
+    TC_Active : Bool;             // Temperature control active
+END_VAR
+
+VAR
+    // PID instances (use CONT_C or PID_Compact in real implementation)
+    PC_Integral : Real := 0.0;    // Pressure PID integral
+    LC_Integral : Real := 0.0;    // Level PID integral
+    FC_Integral : Real := 0.0;    // Flow PID integral
+    TC_Integral : Real := 0.0;    // Temperature PID integral
+    FC2_Integral : Real := 0.0;   // Inner flow PID integral
+    
+    // PID gains
+    PC_Kp : Real := 2.0;
+    PC_Ki : Real := 0.1;
+    LC_Kp : Real := 3.0;
+    LC_Ki : Real := 0.2;
+    FC_Kp : Real := 1.5;
+    FC_Ki : Real := 0.3;
+    TC_Kp : Real := 2.0;
+    TC_Ki : Real := 0.05;
+    
+    // Internal variables
+    PC_Error : Real;
+    LC_Error : Real;
+    FC_Error : Real;
+    TC_Error : Real;
+    Flow_SP : Real;               // Cascade flow setpoint from TC
+    
+    // Temperature window for cooling
+    T_Min : Real := 30.0;
+    T_Max : Real := 70.0;
+END_VAR
+
+VAR_TEMP
+    PC_Out : Real;
+    LC_Out : Real;
+    FC_Out : Real;
+    TC_Out : Real;
+    FC2_Out : Real;
+    CoolingEnable : Bool;
+END_VAR
+
+BEGIN
+    
+    IF NOT #Enable THEN
+        RETURN;
+    END_IF;
+    
+    IF #Reset THEN
+        #PC_Integral := 0.0;
+        #LC_Integral := 0.0;
+        #FC_Integral := 0.0;
+        #TC_Integral := 0.0;
+        #FC2_Integral := 0.0;
+    END_IF;
+    
+    // ========================================================================
+    // PRESSURE CONTROL (P1-PC)
+    // Controls PCV01D and PCV02D based on PIT01 vs B2016 setpoint
+    // ========================================================================
+    
+    #PC_Error := "DB_HAI".P1_B2016 - "DB_HAI".P1_PIT01;
+    #PC_Integral := #PC_Integral + #PC_Error * 0.001;  // dt factor
+    #PC_Integral := LIMIT(MN := -50.0, IN := #PC_Integral, MX := 50.0);
+    
+    #PC_Out := #PC_Kp * #PC_Error + #PC_Ki * #PC_Integral;
+    #PC_Out := LIMIT(MN := 0.0, IN := #PC_Out, MX := 100.0);
+    
+    "DB_HAI".P1_PCV01D := #PC_Out;
+    "DB_HAI".P1_PCV02D := #PC_Out;
+    
+    #PC_Active := TRUE;
+    
+    // ========================================================================
+    // LEVEL CONTROL (P1-LC)
+    // Controls LCV01D based on LIT01 vs B3004 setpoint
+    // ========================================================================
+    
+    #LC_Error := "DB_HAI".P1_B3004 - "DB_HAI".P1_LIT01;
+    #LC_Integral := #LC_Integral + #LC_Error * 0.001;
+    #LC_Integral := LIMIT(MN := -50.0, IN := #LC_Integral, MX := 50.0);
+    
+    #LC_Out := #LC_Kp * #LC_Error + #LC_Ki * #LC_Integral;
+    // Inverse action: high level = more outflow = higher valve
+    #LC_Out := 50.0 - #LC_Out;
+    #LC_Out := LIMIT(MN := 0.0, IN := #LC_Out, MX := 100.0);
+    
+    "DB_HAI".P1_LCV01D := #LC_Out;
+    
+    #LC_Active := TRUE;
+    
+    // ========================================================================
+    // FLOW CONTROL (P1-FC) - Direct loop for FT03
+    // Controls FCV03D based on FT03 vs B3005 setpoint
+    // ========================================================================
+    
+    #FC_Error := "DB_HAI".P1_B3005 - "DB_HAI".P1_FT03;
+    #FC_Integral := #FC_Integral + #FC_Error * 0.001;
+    #FC_Integral := LIMIT(MN := -50.0, IN := #FC_Integral, MX := 50.0);
+    
+    #FC_Out := #FC_Kp * #FC_Error + #FC_Ki * #FC_Integral;
+    #FC_Out := LIMIT(MN := 0.0, IN := #FC_Out, MX := 100.0);
+    
+    "DB_HAI".P1_FCV03D := #FC_Out;
+    
+    // ========================================================================
+    // TEMPERATURE CASCADE CONTROL (P1-TC)
+    // Outer loop: TIT01 vs B4022 -> generates Flow_SP
+    // Inner loop: FT02 vs Flow_SP -> controls FCV01D and FCV02D
+    // ========================================================================
+    
+    // Outer temperature loop
+    #TC_Error := "DB_HAI".P1_B4022 - "DB_HAI".P1_TIT01;
+    #TC_Integral := #TC_Integral + #TC_Error * 0.001;
+    #TC_Integral := LIMIT(MN := -50.0, IN := #TC_Integral, MX := 50.0);
+    
+    #TC_Out := #TC_Kp * #TC_Error + #TC_Ki * #TC_Integral;
+    #Flow_SP := LIMIT(MN := 0.0, IN := #TC_Out, MX := 100.0);
+    
+    // Inner flow loop
+    #FC_Error := #Flow_SP - "DB_HAI".P1_FT02;
+    #FC2_Integral := #FC2_Integral + #FC_Error * 0.001;
+    #FC2_Integral := LIMIT(MN := -50.0, IN := #FC2_Integral, MX := 50.0);
+    
+    #FC2_Out := #FC_Kp * #FC_Error + #FC_Ki * #FC2_Integral;
+    #FC2_Out := LIMIT(MN := 0.0, IN := #FC2_Out, MX := 100.0);
+    
+    "DB_HAI".P1_FCV01D := #FC2_Out;
+    "DB_HAI".P1_FCV02D := #FC2_Out;
+    
+    #TC_Active := TRUE;
+    
+    // ========================================================================
+    // COOLING CONTROL (P1-CC)
+    // Enable cooling pump when temperature in window
+    // ========================================================================
+    
+    #CoolingEnable := ("DB_HAI".P1_TIT03 > #T_Min) AND ("DB_HAI".P1_TIT03 < #T_Max);
+    
+    IF #CoolingEnable THEN
+        "DB_HAI".P1_PP04 := "DB_HAI".P1_PP04SP;
+    ELSE
+        "DB_HAI".P1_PP04 := 0.0;
+    END_IF;
+    
+    // ========================================================================
+    // PUMP CONTROL - Simple on/off based on level
+    // ========================================================================
+    
+    // Pump 1A/1B: Run if level low
+    IF "DB_HAI".P1_LIT01 < 40.0 THEN
+        "DB_HAI".P1_PP01AD := 100.0;
+    ELSIF "DB_HAI".P1_LIT01 > 60.0 THEN
+        "DB_HAI".P1_PP01AD := 0.0;
+    END_IF;
+    
+    // Pump 2: Run with Pump 1
+    "DB_HAI".P1_PP02D := "DB_HAI".P1_PP01AD;
+    
+END_FUNCTION_BLOCK

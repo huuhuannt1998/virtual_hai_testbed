@@ -1,0 +1,176 @@
+DATA_BLOCK "DB_HAI"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+NON_RETAIN
+   STRUCT
+      // =====================================================================
+      // P1: BOILER PROCESS (Emerson Ovation DCS style)
+      // Offsets 0-172 (44 tags × 4 bytes = 176 bytes)
+      // =====================================================================
+      
+      // Setpoints
+      P1_B2004 : Real := 50.0;    // Setpoint (general)
+      P1_B2016 : Real := 10.0;    // Pressure setpoint [bar]
+      P1_B3004 : Real := 50.0;    // Level setpoint [%]
+      P1_B3005 : Real := 30.0;    // Flow setpoint FT03 [L/min]
+      P1_B4002 : Real := 60.0;    // Temperature setpoint 2 [°C]
+      P1_B4005 : Real := 60.0;    // Temperature setpoint 5 [°C]
+      P1_B400B : Real := 60.0;    // Temperature setpoint B [°C]
+      P1_B4022 : Real := 60.0;    // Temperature setpoint TIT01 [°C]
+      
+      // Flow Control Valves - Demand (0-100%)
+      P1_FCV01D : Real := 0.0;    // Flow control valve 1 demand
+      P1_FCV01Z : Real := 0.0;    // Flow control valve 1 position feedback
+      P1_FCV02D : Real := 0.0;    // Flow control valve 2 demand
+      P1_FCV02Z : Real := 0.0;    // Flow control valve 2 position feedback
+      P1_FCV03D : Real := 0.0;    // Flow control valve 3 demand
+      P1_FCV03Z : Real := 0.0;    // Flow control valve 3 position feedback
+      
+      // Flow Transmitters
+      P1_FT01 : Real := 0.0;      // Flow transmitter 1 [L/min]
+      P1_FT01Z : Real := 0.0;     // Flow transmitter 1 scaled [%]
+      P1_FT02 : Real := 0.0;      // Flow transmitter 2 (cascade) [L/min]
+      P1_FT02Z : Real := 0.0;     // Flow transmitter 2 scaled [%]
+      P1_FT03 : Real := 0.0;      // Flow transmitter 3 [L/min]
+      P1_FT03Z : Real := 0.0;     // Flow transmitter 3 scaled [%]
+      
+      // Level Control Valve
+      P1_LCV01D : Real := 0.0;    // Level control valve demand [%]
+      P1_LCV01Z : Real := 0.0;    // Level control valve position [%]
+      
+      // Level Indicator Transmitter
+      P1_LIT01 : Real := 50.0;    // Tank level [%]
+      
+      // Pressure Control Valves
+      P1_PCV01D : Real := 0.0;    // Pressure control valve 1 demand [%]
+      P1_PCV01Z : Real := 0.0;    // Pressure control valve 1 position [%]
+      P1_PCV02D : Real := 0.0;    // Pressure control valve 2 demand [%]
+      P1_PCV02Z : Real := 0.0;    // Pressure control valve 2 position [%]
+      
+      // Pressure Indicator Transmitters
+      P1_PIT01 : Real := 5.0;     // Pressure transmitter 1 [bar]
+      P1_PIT01_HH : Real := 0.0;  // Pressure high-high alarm
+      P1_PIT02 : Real := 4.5;     // Pressure transmitter 2 [bar]
+      
+      // Pumps
+      P1_PP01AD : Real := 0.0;    // Pump 1A demand [%]
+      P1_PP01AR : Real := 0.0;    // Pump 1A running status
+      P1_PP01BD : Real := 0.0;    // Pump 1B demand [%]
+      P1_PP01BR : Real := 0.0;    // Pump 1B running status
+      P1_PP02D : Real := 0.0;     // Pump 2 demand [%]
+      P1_PP02R : Real := 0.0;     // Pump 2 running status
+      P1_PP04 : Real := 0.0;      // Cooling pump frequency [%]
+      P1_PP04SP : Real := 50.0;   // Cooling pump frequency SP [%]
+      
+      // Solenoid Valves
+      P1_SOL01D : Real := 0.0;    // Solenoid valve 1 demand
+      P1_SOL03D : Real := 0.0;    // Solenoid valve 3 demand
+      
+      // Steam Setpoint
+      P1_STSP : Real := 50.0;     // Steam setpoint
+      
+      // Temperature Indicator Transmitters
+      P1_TIT01 : Real := 60.0;    // Temperature transmitter 1 [°C]
+      P1_TIT02 : Real := 55.0;    // Temperature transmitter 2 [°C]
+      P1_TIT03 : Real := 30.0;    // Temperature transmitter 3 (cooling) [°C]
+      
+      // =====================================================================
+      // P2: TURBINE PROCESS (GE Mark VIe DCS style)
+      // Offsets 176-268 (24 tags × 4 bytes = 96 bytes)
+      // =====================================================================
+      
+      // Power and Status
+      P2_24Vdc : Real := 24.0;    // 24V DC power status [V]
+      P2_ATSW_Lamp : Real := 0.0; // Auto/Manual switch lamp
+      
+      // Control Commands
+      P2_AutoGO : Real := 0.0;    // Auto start command
+      P2_AutoSD : Real := 3000.0; // Speed setpoint (auto) [RPM]
+      P2_Emerg : Real := 0.0;     // Emergency trip status
+      
+      // Mode Switches
+      P2_MASW : Real := 1.0;      // Manual/Auto switch position
+      P2_MASW_Lamp : Real := 0.0; // Manual/Auto switch lamp
+      P2_ManualGO : Real := 0.0;  // Manual start command
+      P2_ManualSD : Real := 0.0;  // Manual shutdown command
+      P2_OnOff : Real := 0.0;     // Turbine on/off status
+      
+      // Overspeed Trip
+      P2_RTR : Real := 3600.0;    // Overspeed trip threshold [RPM]
+      
+      // Speed Controller
+      P2_SCO : Real := 0.0;       // Speed controller output [%]
+      P2_SCST : Real := 0.0;      // Speed controller status
+      
+      // Speed Indicator Transmitter
+      P2_SIT01 : Real := 0.0;     // Turbine speed [RPM]
+      
+      // Trip Controls
+      P2_TripEx : Real := 0.0;    // Trip reset/execute
+      
+      // Vibration Transmitters
+      P2_VIBTR01 : Real := 0.5;   // Vibration sensor 1 [mm/s]
+      P2_VIBTR02 : Real := 0.5;   // Vibration sensor 2 [mm/s]
+      P2_VIBTR03 : Real := 0.5;   // Vibration sensor 3 [mm/s]
+      P2_VIBTR04 : Real := 0.5;   // Vibration sensor 4 [mm/s]
+      
+      // Valve
+      P2_VT01 : Real := 0.0;      // Steam valve position [%]
+      
+      // Vibration Trip Thresholds
+      P2_VTR01 : Real := 25.0;    // Vibration trip threshold 1 [mm/s]
+      P2_VTR02 : Real := 25.0;    // Vibration trip threshold 2 [mm/s]
+      P2_VTR03 : Real := 25.0;    // Vibration trip threshold 3 [mm/s]
+      P2_VTR04 : Real := 25.0;    // Vibration trip threshold 4 [mm/s]
+      
+      // =====================================================================
+      // P3: WATER TREATMENT PROCESS (Siemens S7-300 style)
+      // Offsets 272-296 (7 tags × 4 bytes = 28 bytes)
+      // =====================================================================
+      
+      // Flow Indicator Transmitter
+      P3_FIT01 : Real := 0.0;     // Flow rate [L/min]
+      
+      // Pump Control
+      P3_LCP01D : Real := 0.0;    // Pump command (0=off, 1=on)
+      
+      // Level Control Valve
+      P3_LCV01D : Real := 0.0;    // Level control valve demand [%]
+      
+      // Level Thresholds
+      P3_LH01 : Real := 80.0;     // High level threshold [%]
+      P3_LL01 : Real := 20.0;     // Low level threshold [%]
+      
+      // Level Indicator Transmitter
+      P3_LIT01 : Real := 50.0;    // Tank level [%]
+      
+      // Pressure Indicator Transmitter
+      P3_PIT01 : Real := 2.0;     // Pressure [bar]
+      
+      // =====================================================================
+      // P4: HIL SIMULATION (dSPACE SCALEXIO + S7-1500)
+      // Offsets 300-340 (11 tags × 4 bytes = 44 bytes)
+      // =====================================================================
+      
+      // Hydro Turbine (HT)
+      P4_HT_FD : Real := 0.0;     // Hydro turbine flow rate [m³/s]
+      P4_HT_PO : Real := 0.0;     // Hydro turbine power output [MW]
+      P4_HT_PS : Real := 50.0;    // Hydro turbine power setpoint [MW]
+      
+      // Load Demand
+      P4_LD : Real := 100.0;      // Load demand [MW]
+      
+      // Steam Turbine (ST)
+      P4_ST_FD : Real := 0.0;     // Steam turbine flow rate [kg/s]
+      P4_ST_GOV : Real := 50.0;   // Steam turbine governor [%]
+      P4_ST_LD : Real := 0.0;     // Steam turbine load [MW]
+      P4_ST_PO : Real := 0.0;     // Steam turbine power output [MW]
+      P4_ST_PS : Real := 50.0;    // Steam turbine power setpoint [MW]
+      P4_ST_PT01 : Real := 10.0;  // Steam pressure [bar]
+      P4_ST_TT01 : Real := 200.0; // Steam temperature [°C]
+      
+   END_STRUCT;
+
+BEGIN
+
+END_DATA_BLOCK

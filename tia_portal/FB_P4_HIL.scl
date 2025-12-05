@@ -1,0 +1,77 @@
+FUNCTION_BLOCK "FB_P4_HIL"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+// ============================================================================
+// FB_P4_HIL: Hardware-in-the-Loop Power Grid Simulation (P4)
+// 
+// Uses actual HAI dataset tags from DB_HAI
+// Control: Steam turbine governor control, hydro turbine coordination
+// ============================================================================
+
+VAR_INPUT
+    Enable : Bool := TRUE;
+    Reset : Bool := FALSE;
+END_VAR
+
+VAR_OUTPUT
+    ST_Active : Bool;
+    HT_Active : Bool;
+    LoadBalance : Bool;
+END_VAR
+
+VAR
+    GOV_Integral : Real := 0.0;
+    GOV_Kp : Real := 1.0;
+    GOV_Ki : Real := 0.1;
+END_VAR
+
+VAR_TEMP
+    ST_Error : Real;
+    GOV_Out : Real;
+    TotalPower : Real;
+    LoadError : Real;
+END_VAR
+
+BEGIN
+    
+    IF NOT #Enable THEN
+        RETURN;
+    END_IF;
+    
+    IF #Reset THEN
+        #GOV_Integral := 0.0;
+    END_IF;
+    
+    // ========================================================================
+    // STEAM TURBINE GOVERNOR CONTROL
+    // ========================================================================
+    
+    #ST_Error := "DB_HAI".P4_ST_PS - "DB_HAI".P4_ST_PO;
+    #GOV_Integral := #GOV_Integral + #ST_Error * 0.001;
+    #GOV_Integral := LIMIT(MN := -50.0, IN := #GOV_Integral, MX := 50.0);
+    
+    #GOV_Out := #GOV_Kp * #ST_Error + #GOV_Ki * #GOV_Integral;
+    #GOV_Out := LIMIT(MN := 0.0, IN := #GOV_Out, MX := 100.0);
+    
+    "DB_HAI".P4_ST_GOV := #GOV_Out;
+    
+    #ST_Active := TRUE;
+    
+    // ========================================================================
+    // HYDRO TURBINE (follows setpoint directly)
+    // ========================================================================
+    
+    "DB_HAI".P4_HT_PO := "DB_HAI".P4_HT_PS * ("DB_HAI".P4_HT_FD / 10.0);
+    
+    #HT_Active := ("DB_HAI".P4_HT_FD > 0.0);
+    
+    // ========================================================================
+    // LOAD BALANCE CHECK
+    // ========================================================================
+    
+    #TotalPower := "DB_HAI".P4_ST_PO + "DB_HAI".P4_HT_PO;
+    #LoadError := ABS("DB_HAI".P4_LD - #TotalPower);
+    
+    #LoadBalance := (#LoadError < 10.0);  // Within 10 MW
+    
+END_FUNCTION_BLOCK

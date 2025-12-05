@@ -1,0 +1,86 @@
+FUNCTION_BLOCK "FB_P3_Water"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+// ============================================================================
+// FB_P3_Water: Water Treatment Process Control (P3)
+// 
+// Uses actual HAI dataset tags from DB_HAI
+// Control loops:
+// - Level Control: Maintains LIT01 level via LCV01D
+// - Pump Control: LCP01D based on level
+// ============================================================================
+
+VAR_INPUT
+    Enable : Bool := TRUE;
+    Reset : Bool := FALSE;
+END_VAR
+
+VAR_OUTPUT
+    LC_Active : Bool;
+    PumpRunning : Bool;
+END_VAR
+
+VAR
+    LC_Integral : Real := 0.0;
+    LC_Kp : Real := 2.5;
+    LC_Ki : Real := 0.15;
+    Level_SP : Real := 50.0;
+END_VAR
+
+VAR_TEMP
+    LC_Error : Real;
+    LC_Out : Real;
+    LevelLow : Bool;
+    LevelHigh : Bool;
+END_VAR
+
+BEGIN
+    
+    IF NOT #Enable THEN
+        RETURN;
+    END_IF;
+    
+    IF #Reset THEN
+        #LC_Integral := 0.0;
+    END_IF;
+    
+    // ========================================================================
+    // LEVEL ALARMS
+    // ========================================================================
+    
+    #LevelLow := ("DB_HAI".P3_LIT01 < "DB_HAI".P3_LL01);
+    #LevelHigh := ("DB_HAI".P3_LIT01 > "DB_HAI".P3_LH01);
+    
+    // ========================================================================
+    // LEVEL CONTROL
+    // ========================================================================
+    
+    #LC_Error := #Level_SP - "DB_HAI".P3_LIT01;
+    #LC_Integral := #LC_Integral + #LC_Error * 0.001;
+    #LC_Integral := LIMIT(MN := -50.0, IN := #LC_Integral, MX := 50.0);
+    
+    #LC_Out := #LC_Kp * #LC_Error + #LC_Ki * #LC_Integral;
+    #LC_Out := LIMIT(MN := 0.0, IN := #LC_Out, MX := 100.0);
+    
+    "DB_HAI".P3_LCV01D := #LC_Out;
+    
+    #LC_Active := TRUE;
+    
+    // ========================================================================
+    // PUMP CONTROL
+    // ========================================================================
+    
+    IF #LevelLow THEN
+        // Low level - stop pump to prevent dry running
+        "DB_HAI".P3_LCP01D := 0.0;
+    ELSIF #LevelHigh THEN
+        // High level - run pump at full
+        "DB_HAI".P3_LCP01D := 1.0;
+    ELSE
+        // Normal - run pump
+        "DB_HAI".P3_LCP01D := 1.0;
+    END_IF;
+    
+    #PumpRunning := ("DB_HAI".P3_LCP01D > 0.0);
+    
+END_FUNCTION_BLOCK

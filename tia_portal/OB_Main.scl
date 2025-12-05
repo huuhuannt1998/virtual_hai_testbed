@@ -1,0 +1,81 @@
+ORGANIZATION_BLOCK "OB_Main"
+TITLE = "Main Program Cycle"
+VERSION : 0.1
+// ============================================================================
+// OB_Main: Main program cycle for HAI Virtual Testbed
+// 
+// Calls all process function blocks every scan cycle.
+// Data exchange with Python simulation via DB_HAI.
+// ============================================================================
+
+VAR_TEMP
+    tempInt : Int;
+END_VAR
+
+BEGIN
+    
+    // ========================================================================
+    // CALL PROCESS CONTROL BLOCKS
+    // ========================================================================
+    
+    // P1 - Boiler Process Control
+    "FB_P1_Boiler_Inst"(
+        Enable := TRUE,
+        Reset := FALSE
+    );
+    
+    // P2 - Turbine Process Control  
+    "FB_P2_Turbine_Inst"(
+        Enable := TRUE,
+        Reset := FALSE
+    );
+    
+    // P3 - Water Treatment Process Control
+    "FB_P3_Water_Inst"(
+        Enable := TRUE,
+        Reset := FALSE
+    );
+    
+    // P4 - HIL Power Grid Simulation
+    "FB_P4_HIL_Inst"(
+        Enable := TRUE,
+        Reset := FALSE
+    );
+    
+END_ORGANIZATION_BLOCK
+
+
+// ============================================================================
+// Function Block Instances (create these in TIA Portal)
+// ============================================================================
+
+DATA_BLOCK "FB_P1_Boiler_Inst"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+"FB_P1_Boiler"
+BEGIN
+END_DATA_BLOCK
+
+
+DATA_BLOCK "FB_P2_Turbine_Inst"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+"FB_P2_Turbine"
+BEGIN
+END_DATA_BLOCK
+
+
+DATA_BLOCK "FB_P3_Water_Inst"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+"FB_P3_Water"
+BEGIN
+END_DATA_BLOCK
+
+
+DATA_BLOCK "FB_P4_HIL_Inst"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+"FB_P4_HIL"
+BEGIN
+END_DATA_BLOCK

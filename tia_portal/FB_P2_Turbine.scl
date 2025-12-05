@@ -1,0 +1,105 @@
+FUNCTION_BLOCK "FB_P2_Turbine"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+// ============================================================================
+// FB_P2_Turbine: Turbine Process Control (P2)
+// 
+// Uses actual HAI dataset tags from DB_HAI
+// Control loops:
+// - Speed Control: PID on SIT01 vs AutoSD setpoint
+// - Protection: Trip on overspeed (RTR), high vibration
+// ============================================================================
+
+VAR_INPUT
+    Enable : Bool := TRUE;
+    Reset : Bool := FALSE;
+END_VAR
+
+VAR_OUTPUT
+    SC_Active : Bool;
+    Tripped : Bool;
+    TripCode : Int;
+END_VAR
+
+VAR
+    SC_Integral : Real := 0.0;
+    SC_Kp : Real := 0.5;
+    SC_Ki : Real := 0.02;
+    TripLatch : Bool := FALSE;
+    HighVib_Limit : Real := 10.0;
+END_VAR
+
+VAR_TEMP
+    SC_Error : Real;
+    SC_Out : Real;
+    OverspeedTrip : Bool;
+    VibrationTrip : Bool;
+    AvgVibration : Real;
+END_VAR
+
+BEGIN
+    
+    // ========================================================================
+    // PROTECTION LOGIC
+    // ========================================================================
+    
+    // Overspeed check using RTR threshold
+    #OverspeedTrip := ("DB_HAI".P2_SIT01 > "DB_HAI".P2_RTR);
+    
+    // Average vibration from 4 sensors
+    #AvgVibration := ("DB_HAI".P2_VIBTR01 + "DB_HAI".P2_VIBTR02 + 
+                      "DB_HAI".P2_VIBTR03 + "DB_HAI".P2_VIBTR04) / 4.0;
+    #VibrationTrip := (#AvgVibration > #HighVib_Limit);
+    
+    // Latch trip
+    IF #OverspeedTrip OR #VibrationTrip THEN
+        #TripLatch := TRUE;
+        IF #OverspeedTrip THEN
+            #TripCode := 1;
+        ELSE
+            #TripCode := 2;
+        END_IF;
+    END_IF;
+    
+    // Reset
+    IF #Reset AND NOT #OverspeedTrip AND NOT #VibrationTrip THEN
+        #TripLatch := FALSE;
+        #TripCode := 0;
+    END_IF;
+    
+    #Tripped := #TripLatch;
+    
+    // ========================================================================
+    // TRIP ACTIONS
+    // ========================================================================
+    
+    IF #TripLatch THEN
+        "DB_HAI".P2_VT01 := 0.0;
+        "DB_HAI".P2_SCO := 0.0;
+        "DB_HAI".P2_OnOff := 0.0;
+        #SC_Active := FALSE;
+        RETURN;
+    END_IF;
+    
+    IF NOT #Enable THEN
+        RETURN;
+    END_IF;
+    
+    // ========================================================================
+    // SPEED CONTROL
+    // ========================================================================
+    
+    #SC_Error := "DB_HAI".P2_AutoSD - "DB_HAI".P2_SIT01;
+    #SC_Integral := #SC_Integral + #SC_Error * 0.001;
+    #SC_Integral := LIMIT(MN := -200.0, IN := #SC_Integral, MX := 200.0);
+    
+    #SC_Out := #SC_Kp * #SC_Error + #SC_Ki * #SC_Integral;
+    #SC_Out := LIMIT(MN := 0.0, IN := #SC_Out, MX := 100.0);
+    
+    "DB_HAI".P2_VT01 := #SC_Out;
+    "DB_HAI".P2_SCO := #SC_Out;
+    "DB_HAI".P2_OnOff := 1.0;
+    
+    #SC_Active := TRUE;
+    
+END_FUNCTION_BLOCK
