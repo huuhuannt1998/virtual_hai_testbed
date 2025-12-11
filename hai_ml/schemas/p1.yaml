@@ -1,0 +1,239 @@
+# P1 Boiler Process Schema
+# ==========================
+# Defines state/action spaces, reward structure, and safety rules
+
+process: P1
+description: "Boiler process with steam drum, feedwater system, and combustion control"
+rate_hz: 1.0
+
+# State tags (sensors)
+state_tags:
+  # Level indicators
+  - name: P1_LIT01
+    description: "Steam drum level"
+    unit: "%"
+    nominal_min: 30.0
+    nominal_max: 70.0
+    alarm_lo: 20.0
+    alarm_hi: 80.0
+  
+  - name: P1_LIT02
+    description: "Feedwater tank level"
+    unit: "%"
+    nominal_min: 20.0
+    nominal_max: 80.0
+    alarm_lo: 15.0
+    alarm_hi: 85.0
+  
+  # Pressure indicators
+  - name: P1_PIT01
+    description: "Steam drum pressure"
+    unit: "bar"
+    nominal_min: 5.0
+    nominal_max: 12.0
+    alarm_lo: 3.0
+    alarm_hi: 15.0
+  
+  - name: P1_PIT02
+    description: "Feedwater pressure"
+    unit: "bar"
+    nominal_min: 8.0
+    nominal_max: 18.0
+    alarm_lo: 6.0
+    alarm_hi: 20.0
+  
+  # Temperature indicators
+  - name: P1_TIT01
+    description: "Steam temperature"
+    unit: "degC"
+    nominal_min: 150.0
+    nominal_max: 200.0
+    alarm_lo: 120.0
+    alarm_hi: 220.0
+  
+  - name: P1_TIT02
+    description: "Feedwater temperature"
+    unit: "degC"
+    nominal_min: 40.0
+    nominal_max: 100.0
+    alarm_lo: 20.0
+    alarm_hi: 110.0
+  
+  - name: P1_TIT03
+    description: "Flue gas temperature"
+    unit: "degC"
+    nominal_min: 150.0
+    nominal_max: 300.0
+    alarm_lo: 100.0
+    alarm_hi: 350.0
+  
+  # Flow indicators
+  - name: P1_FIT01
+    description: "Steam flow"
+    unit: "kg/h"
+    nominal_min: 0.0
+    nominal_max: 1000.0
+    alarm_lo: 0.0
+    alarm_hi: 1200.0
+  
+  - name: P1_FIT02
+    description: "Feedwater flow"
+    unit: "kg/h"
+    nominal_min: 0.0
+    nominal_max: 1200.0
+    alarm_lo: 0.0
+    alarm_hi: 1400.0
+  
+  - name: P1_FIT03
+    description: "Fuel gas flow"
+    unit: "Nm3/h"
+    nominal_min: 0.0
+    nominal_max: 100.0
+    alarm_lo: 0.0
+    alarm_hi: 120.0
+
+# Action tags (actuators)
+action_tags:
+  - name: P1_MV01
+    description: "Feedwater control valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 8.0
+  
+  - name: P1_MV02
+    description: "Steam outlet valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 5.0
+  
+  - name: P1_MV03
+    description: "Fuel gas valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 3.0
+  
+  - name: P1_P01_SPEED
+    description: "Feedwater pump speed"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 5.0
+  
+  - name: P1_FAN_SPEED
+    description: "Combustion air fan speed"
+    unit: "%"
+    min: 10.0
+    max: 100.0
+    clip: true
+    rate_limit: 3.0
+
+# Reward function configuration
+reward:
+  track_targets:
+    P1_LIT01: 50.0
+    P1_PIT01: 10.0
+    P1_TIT01: 180.0
+  
+  w_track: 1.0
+  w_wear: 0.15
+  w_energy: 0.1
+  penalty_violation: 15.0
+
+# Safety rules
+safety_rules:
+  - id: R01
+    description: "Drum high level protection"
+    condition: "P1_LIT01 > 75.0"
+    action: "limit P1_MV01 in [0.0, 30.0]"
+    severity: high
+  
+  - id: R02
+    description: "Drum low level protection"
+    condition: "P1_LIT01 < 25.0"
+    action: "set P1_MV01 := 80.0; limit P1_MV02 in [0.0, 40.0]"
+    severity: critical
+  
+  - id: R03
+    description: "Drum very low level - trip"
+    condition: "P1_LIT01 < 15.0"
+    action: "set P1_MV03 := 0.0; set P1_FAN_SPEED := 10.0"
+    severity: critical
+  
+  - id: R04
+    description: "Steam overpressure protection"
+    condition: "P1_PIT01 > 14.0"
+    action: "set P1_MV02 := 100.0; limit P1_MV03 in [0.0, 30.0]"
+    severity: critical
+  
+  - id: R05
+    description: "Steam pressure low"
+    condition: "P1_PIT01 < 4.0"
+    action: "limit P1_MV02 in [0.0, 50.0]"
+    severity: medium
+  
+  - id: R06
+    description: "Steam overtemperature"
+    condition: "P1_TIT01 > 210.0"
+    action: "limit P1_MV03 in [0.0, 50.0]; set P1_MV01 := 70.0"
+    severity: high
+  
+  - id: R07
+    description: "Flue gas overtemperature"
+    condition: "P1_TIT03 > 320.0"
+    action: "limit P1_MV03 in [0.0, 40.0]; set P1_FAN_SPEED := 80.0"
+    severity: high
+  
+  - id: R08
+    description: "Feedwater tank low"
+    condition: "P1_LIT02 < 20.0"
+    action: "limit P1_P01_SPEED in [0.0, 30.0]"
+    severity: medium
+  
+  - id: R09
+    description: "Fuel-air ratio protection"
+    condition: "P1_FIT03 > 0.0 and P1_FAN_SPEED < 20.0"
+    action: "set P1_FAN_SPEED := 30.0"
+    severity: critical
+  
+  - id: R10
+    description: "Maximum fuel rate"
+    condition: "P1_FIT03 > 110.0"
+    action: "limit P1_MV03 in [0.0, 80.0]"
+    severity: high
+  
+  - id: R11
+    description: "Feedwater pressure interlock"
+    condition: "P1_PIT02 < P1_PIT01 + 2.0"
+    action: "limit P1_MV01 in [0.0, 30.0]"
+    severity: medium
+  
+  - id: R12
+    description: "Rate limit fuel valve"
+    condition: "abs(delta_P1_MV03) > 3.0"
+    action: "rate_limit P1_MV03 to 3.0"
+    severity: low
+  
+  - id: R13
+    description: "Rate limit feedwater"
+    condition: "abs(delta_P1_MV01) > 8.0"
+    action: "rate_limit P1_MV01 to 8.0"
+    severity: low
+  
+  - id: R14
+    description: "Emergency shutdown"
+    condition: "P1_LIT01 < 10.0 or P1_PIT01 > 16.0"
+    action: "set P1_MV03 := 0.0; set P1_FAN_SPEED := 10.0; set P1_MV02 := 100.0"
+    severity: critical
+  
+  - id: R15
+    description: "Thermal stress protection"
+    condition: "abs(P1_TIT01 - P1_TIT02) > 150.0"
+    action: "limit P1_MV01 in [20.0, 60.0]"
+    severity: medium

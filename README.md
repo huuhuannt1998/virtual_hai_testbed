@@ -146,6 +146,100 @@ timestamp,P1_B2004,P1_B2016,...,P4_ST_TT01,Attack
 ...
 ```
 
+## Attack Simulation
+
+The testbed includes a comprehensive attack simulation module that can inject false data directly into the real PLC.
+
+### Quick Start
+
+```bash
+# Run normal simulation in one terminal
+python -m hai.runner
+
+# Run attack in another terminal
+python run_multi_attack.py p1 30
+```
+
+### Available Attack Scenarios
+
+| Process | Command | Attacks |
+|---------|---------|---------|
+| **P1 Boiler** | `python run_multi_attack.py p1 30` | Pressure +5 bar, Level -20%, Temp +15°C |
+| **P2 Turbine** | `python run_multi_attack.py p2 30` | Speed +500 RPM, Vibration +10 mm/s |
+| **P3 Water** | `python run_multi_attack.py p3 30` | Level +30%, Flow -15 L/min |
+| **P4 HIL** | `python run_multi_attack.py p4 30` | Steam pressure +50, Load +20% |
+| **All** | `python run_multi_attack.py all 60` | All attacks on all processes |
+
+### Attack Details by Process
+
+#### P1 Boiler Attacks
+
+| Tag | Description | Normal Value | Attack Effect | Timing |
+|-----|-------------|--------------|---------------|--------|
+| `P1_PIT01` | Pressure transmitter 1 | ~5 bar | **+5 bar** → ~10 bar | 5-15s |
+| `P1_LIT01` | Tank level | ~50% | **-20%** → ~30% | 20-30s |
+| `P1_TIT01` | Temperature transmitter 1 | ~60°C | **+15°C** → ~75°C | 35-45s |
+
+#### P2 Turbine Attacks
+
+| Tag | Description | Normal Value | Attack Effect | Timing |
+|-----|-------------|--------------|---------------|--------|
+| `P2_SIT01` | Turbine speed | ~3000 RPM | **+500 RPM** → ~3500 RPM | 5-15s |
+| `P2_VIBTR01` | Vibration sensor 1 | ~0.5 mm/s | **+10 mm/s** → ~10.5 mm/s | 20-30s |
+| `P2_VIBTR02` | Vibration sensor 2 | ~0.5 mm/s | **+10 mm/s** → ~10.5 mm/s | 20-30s |
+
+#### P3 Water Treatment Attacks
+
+| Tag | Description | Normal Value | Attack Effect | Timing |
+|-----|-------------|--------------|---------------|--------|
+| `P3_LIT01` | Tank level | ~50% | **+30%** → ~80% | 5-15s |
+| `P3_FIT01` | Flow rate | ~20 L/min | **-15 L/min** → ~5 L/min | 20-30s |
+
+#### P4 HIL Power Grid Attacks
+
+| Tag | Description | Normal Value | Attack Effect | Timing |
+|-----|-------------|--------------|---------------|--------|
+| `P4_ST_PT01` | Steam turbine pressure | ~10 | **+50** → ~60 | 5-15s |
+| `P4_LD` | Load demand | ~50% | **+20%** → ~70% | 20-30s |
+
+### Attack Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `BIAS_INJECTION` | Add constant offset to sensor | Pressure +5 bar |
+| `REPLAY` | Replay old sensor values | 20-second delayed readings |
+| `DOS` | Freeze values (denial of service) | Lock level at 50% |
+| `SCALING` | Multiply values by factor | Speed × 1.2 |
+| `RAMP` | Gradually change values | Slow pressure increase |
+| `RANDOM_NOISE` | Add noise to readings | ±2% fluctuation |
+
+### Verify Attacks on PLC
+
+Monitor PLC values in real-time to confirm attack injection:
+
+```bash
+python verify_attack_on_plc.py
+```
+
+This reads values directly from the PLC and displays them with attack detection alerts.
+
+### Custom Attack Configuration
+
+```python
+from hai.attacks import AttackSimulator, AttackConfig, AttackType
+
+attack = AttackConfig(
+    attack_type=AttackType.BIAS_INJECTION,
+    target_tags=['P1_PIT01', 'P1_PIT02'],
+    bias_value=5.0,      # Add 5 bar
+    start_time=10.0,     # Start at t=10s
+    duration=30.0        # Last 30 seconds
+)
+
+simulator = AttackSimulator()
+simulator.add_attack(attack)
+```
+
 ## Extending the Testbed
 
 ### Adding Attacks

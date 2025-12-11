@@ -1,1 +1,21 @@
+# PLC communication
 python-snap7>=1.1.0
+
+# Core ML dependencies
+torch>=2.2
+numpy>=1.26
+pandas>=2.2
+matplotlib>=3.9
+scipy>=1.13
+scikit-learn>=1.5
+
+# RL and environments
+gymnasium>=0.29
+d3rlpy>=2.6
+
+# Configuration
+ruamel.yaml>=0.18
+
+# Additional utilities
+tqdm>=4.66
+joblib>=1.3

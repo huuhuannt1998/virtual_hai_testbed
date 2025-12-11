@@ -24,6 +24,7 @@ pip-delete-this-directory.txt
 .DS_Store
 Thumbs.db
 
+
 # TIA Portal backup files
 *.bak
 *.tmp

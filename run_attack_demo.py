@@ -1,9 +1,3 @@
-"""
-HAI Testbed - Attack Simulation Demo
-
-This script runs the HAI virtual testbed with various attack scenarios.
-"""
-
 import time
 import sys
 import os
@@ -53,16 +47,16 @@ def run_attack_simulation(duration_seconds=120):
     print("\n[3/4] Setting up attack scenarios...")
     attack_sim = AttackSimulator()
     
-    # Attack 1: Pressure bias injection (30-60s)
+    # Attack 1: Pressure bias injection (5-15s for testing)
     attack1 = AttackConfig(
         attack_type=AttackType.BIAS_INJECTION,
         target_tags=['P1_PIT01'],
         bias_value=5.0,  # Add 5 bar to pressure reading
-        start_time=30.0,
-        duration=30.0
+        start_time=5.0,  # Start early for quick testing
+        duration=10.0
     )
     attack_sim.add_attack(attack1)
-    print("      - Attack 1: P1 Pressure Bias (+5 bar) @ 30-60s")
+    print("      - Attack 1: P1 Pressure Bias (+5 bar) @ 5-15s [INJECTED TO PLC]")
     
     # Attack 2: Level replay attack (90-120s)
     attack2 = AttackConfig(
@@ -102,14 +96,19 @@ def run_attack_simulation(duration_seconds=120):
             # Step the plant simulation
             plant.step()  # No dt argument
             
-            # Get current sensor values
+            # Get current sensor values from plant simulation
             sensors = {
                 'P1_PIT01': plant.state.p1.pressure1,
                 'P1_LIT01': plant.state.p1.level,
             }
             
-            # Apply attacks to sensor values (what gets written to PLC)
+            # Apply attacks to sensor values
             attacked_sensors = attack_sim.apply_to_sensors(sensors)
+            
+            # *** INJECT ATTACKED VALUES TO REAL PLC ***
+            if attack_sim.is_under_attack:
+                # Write attacked sensor values to PLC (overriding normal values)
+                plc.write_multiple_tags(attacked_sensors)
             
             # Get attack status
             attack_label = attack_sim.attack_label
@@ -117,7 +116,8 @@ def run_attack_simulation(duration_seconds=120):
             
             # Print status every 5 seconds
             if step % 5 == 0:
-                print(f"{step:>5}s | {attack_name:^20} | {attacked_sensors['P1_PIT01']:>10.2f} | {attacked_sensors['P1_LIT01']:>10.2f}")
+                indicator = " [INJECTED]" if attack_sim.is_under_attack else ""
+                print(f"{step:>5}s | {attack_name:^20} | {attacked_sensors['P1_PIT01']:>10.2f} | {attacked_sensors['P1_LIT01']:>10.2f}{indicator}")
             
             # Log data (with attack label)
             log_data = plant.get_all_values()

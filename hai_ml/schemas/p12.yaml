@@ -1,0 +1,286 @@
+# P12 Coupled Boiler-Turbine Process Schema
+# ==========================================
+# Combined P1 (Boiler) + P2 (Turbine) with cross-process constraints
+
+process: P12
+description: "Coupled boiler-turbine system with steam header and power generation"
+rate_hz: 1.0
+
+# State tags (sensors) - Combined from P1 and P2
+state_tags:
+  # P1 Boiler states
+  - name: P1_LIT01
+    description: "Steam drum level"
+    unit: "%"
+    nominal_min: 30.0
+    nominal_max: 70.0
+    alarm_lo: 20.0
+    alarm_hi: 80.0
+  
+  - name: P1_PIT01
+    description: "Steam drum pressure"
+    unit: "bar"
+    nominal_min: 5.0
+    nominal_max: 12.0
+    alarm_lo: 3.0
+    alarm_hi: 15.0
+  
+  - name: P1_TIT01
+    description: "Steam temperature"
+    unit: "degC"
+    nominal_min: 150.0
+    nominal_max: 200.0
+    alarm_lo: 120.0
+    alarm_hi: 220.0
+  
+  - name: P1_FIT01
+    description: "Steam flow to header"
+    unit: "kg/h"
+    nominal_min: 0.0
+    nominal_max: 1000.0
+    alarm_lo: 0.0
+    alarm_hi: 1200.0
+  
+  - name: P1_FIT02
+    description: "Feedwater flow"
+    unit: "kg/h"
+    nominal_min: 0.0
+    nominal_max: 1200.0
+    alarm_lo: 0.0
+    alarm_hi: 1400.0
+  
+  # P2 Turbine states
+  - name: P2_PIT01
+    description: "Steam header pressure"
+    unit: "bar"
+    nominal_min: 4.0
+    nominal_max: 11.0
+    alarm_lo: 3.0
+    alarm_hi: 13.0
+  
+  - name: P2_TIT01
+    description: "Turbine inlet temperature"
+    unit: "degC"
+    nominal_min: 140.0
+    nominal_max: 195.0
+    alarm_lo: 120.0
+    alarm_hi: 210.0
+  
+  - name: P2_FIT01
+    description: "Turbine steam flow"
+    unit: "kg/h"
+    nominal_min: 0.0
+    nominal_max: 900.0
+    alarm_lo: 0.0
+    alarm_hi: 1100.0
+  
+  - name: P2_SIT01
+    description: "Turbine speed"
+    unit: "rpm"
+    nominal_min: 2800.0
+    nominal_max: 3200.0
+    alarm_lo: 2500.0
+    alarm_hi: 3500.0
+  
+  - name: P2_PIT02
+    description: "Condenser vacuum"
+    unit: "mbar_abs"
+    nominal_min: 40.0
+    nominal_max: 80.0
+    alarm_lo: 30.0
+    alarm_hi: 150.0
+  
+  - name: P2_POWER
+    description: "Generator power output"
+    unit: "kW"
+    nominal_min: 0.0
+    nominal_max: 500.0
+    alarm_lo: 0.0
+    alarm_hi: 550.0
+  
+  - name: P2_VIB01
+    description: "Turbine bearing vibration"
+    unit: "mm/s"
+    nominal_min: 0.0
+    nominal_max: 4.0
+    alarm_lo: 0.0
+    alarm_hi: 7.0
+
+# Action tags (actuators) - Combined
+action_tags:
+  # P1 Boiler actuators
+  - name: P1_MV01
+    description: "Feedwater control valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 8.0
+  
+  - name: P1_MV03
+    description: "Fuel gas valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 3.0
+  
+  - name: P1_P01_SPEED
+    description: "Feedwater pump speed"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 5.0
+  
+  # P2 Turbine actuators
+  - name: P2_MV01
+    description: "Turbine steam inlet valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 5.0
+  
+  - name: P2_MV02
+    description: "Turbine bypass valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 10.0
+  
+  - name: P2_GOVERNOR
+    description: "Turbine governor setpoint"
+    unit: "rpm"
+    min: 2800.0
+    max: 3200.0
+    clip: true
+    rate_limit: 20.0
+
+# Reward function configuration
+reward:
+  track_targets:
+    P1_LIT01: 50.0
+    P1_PIT01: 10.0
+    P2_PIT01: 9.0
+    P2_SIT01: 3000.0
+    P2_POWER: 400.0
+  
+  w_track: 1.0
+  w_wear: 0.12
+  w_energy: 0.08
+  penalty_violation: 20.0
+
+# Safety rules - Cross-process constraints
+safety_rules:
+  # P1 Boiler rules
+  - id: R01
+    description: "Drum level high"
+    condition: "P1_LIT01 > 75.0"
+    action: "limit P1_MV01 in [0.0, 30.0]"
+    severity: high
+  
+  - id: R02
+    description: "Drum level low"
+    condition: "P1_LIT01 < 25.0"
+    action: "set P1_MV01 := 80.0"
+    severity: critical
+  
+  - id: R03
+    description: "Boiler overpressure"
+    condition: "P1_PIT01 > 14.0"
+    action: "limit P1_MV03 in [0.0, 20.0]; set P2_MV02 := 80.0"
+    severity: critical
+  
+  # P2 Turbine rules
+  - id: R04
+    description: "Turbine overspeed"
+    condition: "P2_SIT01 > 3300.0"
+    action: "limit P2_MV01 in [0.0, 50.0]; set P2_GOVERNOR := 3000.0"
+    severity: critical
+  
+  - id: R05
+    description: "Turbine underspeed"
+    condition: "P2_SIT01 < 2700.0"
+    action: "set P2_MV01 := 60.0"
+    severity: high
+  
+  - id: R06
+    description: "High vibration"
+    condition: "P2_VIB01 > 5.5"
+    action: "limit P2_MV01 in [0.0, 40.0]; limit P2_GOVERNOR in [2800.0, 3000.0]"
+    severity: critical
+  
+  - id: R07
+    description: "Condenser vacuum loss"
+    condition: "P2_PIT02 > 120.0"
+    action: "limit P2_MV01 in [0.0, 30.0]"
+    severity: high
+  
+  # Cross-process coupling rules
+  - id: R08
+    description: "Steam balance - header underpressure"
+    condition: "P2_PIT01 < P1_PIT01 - 3.0"
+    action: "limit P2_MV01 in [0.0, 50.0]"
+    severity: medium
+  
+  - id: R09
+    description: "Steam balance - header overpressure"
+    condition: "P2_PIT01 > P1_PIT01 + 1.0"
+    action: "set P2_MV02 := 50.0"
+    severity: medium
+  
+  - id: R10
+    description: "Turbine thermal protection"
+    condition: "P2_TIT01 > 205.0"
+    action: "limit P2_MV01 in [0.0, 60.0]; limit P1_MV03 in [0.0, 60.0]"
+    severity: high
+  
+  - id: R11
+    description: "Power generation limit"
+    condition: "P2_POWER > 520.0"
+    action: "limit P2_MV01 in [0.0, 70.0]"
+    severity: medium
+  
+  - id: R12
+    description: "Steam flow mismatch"
+    condition: "P1_FIT01 - P2_FIT01 > 200.0"
+    action: "set P2_MV02 := 60.0"
+    severity: medium
+  
+  - id: R13
+    description: "Load rejection protection"
+    condition: "P2_POWER < 50.0 and P2_SIT01 > 3100.0"
+    action: "limit P2_MV01 in [0.0, 20.0]; set P2_MV02 := 100.0"
+    severity: critical
+  
+  - id: R14
+    description: "Rate limit governor"
+    condition: "abs(delta_P2_GOVERNOR) > 20.0"
+    action: "rate_limit P2_GOVERNOR to 20.0"
+    severity: low
+  
+  - id: R15
+    description: "Emergency coupled shutdown"
+    condition: "P1_LIT01 < 15.0 or P2_VIB01 > 7.0 or P2_SIT01 > 3400.0"
+    action: "set P1_MV03 := 0.0; set P2_MV01 := 0.0; set P2_MV02 := 100.0"
+    severity: critical
+  
+  - id: R16
+    description: "Feedwater-steam balance"
+    condition: "P1_FIT02 < P1_FIT01 * 0.8"
+    action: "set P1_MV01 := 70.0; set P1_P01_SPEED := 80.0"
+    severity: high
+  
+  - id: R17
+    description: "Startup sequence protection"
+    condition: "P1_PIT01 < 5.0 and P2_MV01 > 20.0"
+    action: "limit P2_MV01 in [0.0, 10.0]"
+    severity: high
+  
+  - id: R18
+    description: "Turbine inlet temperature low"
+    condition: "P2_TIT01 < 130.0 and P2_MV01 > 30.0"
+    action: "limit P2_MV01 in [0.0, 20.0]"
+    severity: medium

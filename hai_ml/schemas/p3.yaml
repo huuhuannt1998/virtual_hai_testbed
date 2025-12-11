@@ -1,0 +1,302 @@
+# P3 Water Treatment Process Schema
+# ==================================
+# Defines state/action spaces, reward structure, and safety rules
+
+process: P3
+description: "Water treatment process with raw water tank, UF system, and RO system"
+rate_hz: 1.0
+
+# State tags (sensors) - all z-scored during training
+state_tags:
+  # Level indicators
+  - name: P3_LIT01
+    description: "Raw water tank level"
+    unit: "%"
+    nominal_min: 10.0
+    nominal_max: 90.0
+    alarm_lo: 5.0
+    alarm_hi: 95.0
+  
+  - name: P3_LIT02
+    description: "UF feed tank level"
+    unit: "%"
+    nominal_min: 15.0
+    nominal_max: 85.0
+    alarm_lo: 10.0
+    alarm_hi: 90.0
+  
+  - name: P3_LIT03
+    description: "RO feed tank level"
+    unit: "%"
+    nominal_min: 20.0
+    nominal_max: 80.0
+    alarm_lo: 15.0
+    alarm_hi: 85.0
+  
+  # Pressure indicators
+  - name: P3_PIT01
+    description: "UF inlet pressure"
+    unit: "bar"
+    nominal_min: 1.0
+    nominal_max: 4.0
+    alarm_lo: 0.5
+    alarm_hi: 5.0
+  
+  - name: P3_PIT02
+    description: "UF outlet pressure"
+    unit: "bar"
+    nominal_min: 0.5
+    nominal_max: 3.5
+    alarm_lo: 0.2
+    alarm_hi: 4.0
+  
+  - name: P3_PIT03
+    description: "RO inlet pressure"
+    unit: "bar"
+    nominal_min: 8.0
+    nominal_max: 15.0
+    alarm_lo: 6.0
+    alarm_hi: 18.0
+  
+  # Flow indicators
+  - name: P3_FIT01
+    description: "Raw water inlet flow"
+    unit: "m3/h"
+    nominal_min: 0.0
+    nominal_max: 50.0
+    alarm_lo: 0.0
+    alarm_hi: 60.0
+  
+  - name: P3_FIT02
+    description: "UF permeate flow"
+    unit: "m3/h"
+    nominal_min: 0.0
+    nominal_max: 45.0
+    alarm_lo: 0.0
+    alarm_hi: 55.0
+  
+  - name: P3_FIT03
+    description: "RO permeate flow"
+    unit: "m3/h"
+    nominal_min: 0.0
+    nominal_max: 30.0
+    alarm_lo: 0.0
+    alarm_hi: 40.0
+  
+  # Quality indicators
+  - name: P3_AIT01
+    description: "Raw water turbidity"
+    unit: "NTU"
+    nominal_min: 0.0
+    nominal_max: 5.0
+    alarm_lo: 0.0
+    alarm_hi: 10.0
+  
+  - name: P3_AIT02
+    description: "UF permeate turbidity"
+    unit: "NTU"
+    nominal_min: 0.0
+    nominal_max: 0.5
+    alarm_lo: 0.0
+    alarm_hi: 1.0
+  
+  - name: P3_AIT03
+    description: "RO conductivity"
+    unit: "uS/cm"
+    nominal_min: 0.0
+    nominal_max: 500.0
+    alarm_lo: 0.0
+    alarm_hi: 800.0
+
+# Action tags (actuators) - output as deltas with bounds
+action_tags:
+  - name: P3_MV01
+    description: "Raw water inlet valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 10.0  # max change per second
+  
+  - name: P3_MV02
+    description: "UF feed valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 10.0
+  
+  - name: P3_MV03
+    description: "RO feed valve"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 10.0
+  
+  - name: P3_P01_SPEED
+    description: "Raw water pump speed"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 5.0
+  
+  - name: P3_P02_SPEED
+    description: "UF feed pump speed"
+    unit: "%"
+    min: 0.0
+    max: 100.0
+    clip: true
+    rate_limit: 5.0
+  
+  - name: P3_P03_SPEED
+    description: "RO high pressure pump speed"
+    unit: "%"
+    min: 20.0
+    max: 100.0
+    clip: true
+    rate_limit: 3.0
+
+# Reward function configuration
+reward:
+  # Tracking targets (setpoints)
+  track_targets:
+    P3_LIT01: 50.0
+    P3_LIT02: 50.0
+    P3_LIT03: 50.0
+    P3_FIT03: 20.0  # Target RO permeate flow
+  
+  # Reward weights
+  w_track: 1.0          # Weight for tracking error
+  w_wear: 0.1           # Weight for actuator wear (action changes)
+  w_energy: 0.05        # Weight for energy consumption
+  penalty_violation: 10.0  # Penalty per safety violation
+
+# Safety rules for the shield
+safety_rules:
+  # Level protection rules
+  - id: R01
+    description: "Prevent raw water tank overflow"
+    condition: "P3_LIT01 > 90.0"
+    action: "limit P3_MV01 in [0.0, 50.0]"
+    severity: high
+  
+  - id: R02
+    description: "Prevent raw water tank empty"
+    condition: "P3_LIT01 < 15.0"
+    action: "set P3_MV01 := 80.0"
+    severity: high
+  
+  - id: R03
+    description: "Prevent UF tank overflow"
+    condition: "P3_LIT02 > 85.0"
+    action: "limit P3_MV02 in [0.0, 30.0]"
+    severity: high
+  
+  - id: R04
+    description: "Prevent UF tank empty"
+    condition: "P3_LIT02 < 20.0"
+    action: "limit P3_P02_SPEED in [0.0, 30.0]"
+    severity: high
+  
+  - id: R05
+    description: "Prevent RO tank overflow"
+    condition: "P3_LIT03 > 80.0"
+    action: "limit P3_MV03 in [0.0, 20.0]"
+    severity: high
+  
+  - id: R06
+    description: "Prevent RO tank empty"
+    condition: "P3_LIT03 < 25.0"
+    action: "limit P3_P03_SPEED in [20.0, 50.0]"
+    severity: high
+  
+  # Pressure protection rules
+  - id: R07
+    description: "UF overpressure protection"
+    condition: "P3_PIT01 > 4.5"
+    action: "limit P3_P01_SPEED in [0.0, 50.0]"
+    severity: critical
+  
+  - id: R08
+    description: "UF low pressure protection"
+    condition: "P3_PIT01 < 0.8"
+    action: "set P3_P01_SPEED := 60.0"
+    severity: medium
+  
+  - id: R09
+    description: "RO overpressure protection"
+    condition: "P3_PIT03 > 16.0"
+    action: "limit P3_P03_SPEED in [20.0, 60.0]"
+    severity: critical
+  
+  - id: R10
+    description: "RO low pressure protection"
+    condition: "P3_PIT03 < 7.0"
+    action: "set P3_P03_SPEED := 80.0"
+    severity: medium
+  
+  # Flow protection rules
+  - id: R11
+    description: "Excessive inlet flow"
+    condition: "P3_FIT01 > 55.0"
+    action: "limit P3_MV01 in [0.0, 60.0]"
+    severity: medium
+  
+  - id: R12
+    description: "UF flow imbalance"
+    condition: "P3_FIT02 > P3_FIT01 * 1.1"
+    action: "limit P3_P02_SPEED in [0.0, 70.0]"
+    severity: medium
+  
+  # Quality protection rules
+  - id: R13
+    description: "High raw water turbidity"
+    condition: "P3_AIT01 > 8.0"
+    action: "limit P3_MV01 in [0.0, 40.0]"
+    severity: medium
+  
+  - id: R14
+    description: "UF quality degradation"
+    condition: "P3_AIT02 > 0.8"
+    action: "limit P3_P02_SPEED in [0.0, 50.0]"
+    severity: high
+  
+  - id: R15
+    description: "RO conductivity high"
+    condition: "P3_AIT03 > 600.0"
+    action: "limit P3_P03_SPEED in [20.0, 70.0]"
+    severity: high
+  
+  # Rate limiting rules
+  - id: R16
+    description: "Valve rate limit MV01"
+    condition: "abs(delta_P3_MV01) > 10.0"
+    action: "rate_limit P3_MV01 to 10.0"
+    severity: low
+  
+  - id: R17
+    description: "Valve rate limit MV02"
+    condition: "abs(delta_P3_MV02) > 10.0"
+    action: "rate_limit P3_MV02 to 10.0"
+    severity: low
+  
+  - id: R18
+    description: "Pump rate limit P03"
+    condition: "abs(delta_P3_P03_SPEED) > 3.0"
+    action: "rate_limit P3_P03_SPEED to 3.0"
+    severity: low
+  
+  # Combined conditions
+  - id: R19
+    description: "Emergency low level cascade"
+    condition: "P3_LIT01 < 10.0 and P3_LIT02 < 15.0"
+    action: "set P3_MV01 := 100.0; limit P3_P02_SPEED in [0.0, 20.0]"
+    severity: critical
+  
+  - id: R20
+    description: "System pressure interlock"
+    condition: "P3_PIT01 > 4.0 and P3_PIT03 > 15.0"
+    action: "limit P3_P01_SPEED in [0.0, 40.0]; limit P3_P03_SPEED in [20.0, 50.0]"
+    severity: critical

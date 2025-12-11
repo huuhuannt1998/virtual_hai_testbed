@@ -1,0 +1,244 @@
+# ==============================================================================
+# P12 (Coupled Boiler-Turbine) Baseline Evaluation Configuration
+# ==============================================================================
+# Configuration for P12 coupled subprocess evaluation to test generalization
+# across multi-stage processes.
+
+experiment:
+  name: "p12_coupled_baseline"
+  description: "Evaluation for P12 coupled boiler-turbine with safety shields"
+  seed: 42
+  device: "cuda"
+  
+schema:
+  path: "../schemas/p12.yaml"
+
+data:
+  csv_path: "data/hai/train_p12.csv"
+  val_csv_path: "data/hai/val_p12.csv"
+  test_csv_path: "data/hai/test_p12.csv"
+  output_dir: "data/processed/p12"
+  
+  normalize: true
+  reward_scale: 1.0
+  terminal_threshold: 0.2
+  
+  train_frac: 0.7
+  val_frac: 0.15
+  test_frac: 0.15
+
+environment:
+  max_steps: 7200      # 2 hours for coupled system
+  action_repeat: 1
+  frame_stack: 1
+  reward_shaping: true
+  
+  attack:
+    enabled: false
+    type: null
+    params: {}
+
+bc:
+  enabled: true
+  
+  # Larger network for coupled system
+  hidden_dims: [512, 256, 256]
+  activation: "relu"
+  dropout: 0.15
+  
+  batch_size: 256
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  n_epochs: 150
+  early_stopping_patience: 15
+  
+  grad_clip_norm: 1.0
+  
+  model_path: "models/p12/bc/policy.pt"
+  log_dir: "logs/p12/bc"
+
+offline_rl:
+  enabled: true
+  
+  algorithms:
+    - name: "td3bc"
+      enabled: true
+      params:
+        alpha: 3.0           # Higher for coupled system
+        actor_lr: 1.0e-4
+        critic_lr: 1.0e-4
+        tau: 0.005
+        gamma: 0.99
+        n_critics: 2
+        hidden_dims: [512, 256]
+        
+    - name: "cql"
+      enabled: true
+      params:
+        alpha: 7.0           # Higher for coupled system
+        actor_lr: 1.0e-4
+        critic_lr: 1.0e-4
+        tau: 0.005
+        gamma: 0.99
+        n_critics: 2
+        hidden_dims: [512, 256]
+        
+    - name: "iql"
+      enabled: true
+      params:
+        expectile: 0.75
+        actor_lr: 1.0e-4
+        critic_lr: 1.0e-4
+        tau: 0.005
+        gamma: 0.99
+        hidden_dims: [512, 256]
+  
+  training:
+    batch_size: 256
+    n_steps: 200000       # More steps for coupled system
+    eval_interval: 20000
+    n_eval_episodes: 10
+    grad_clip_norm: 1.0
+    
+  model_dir: "models/p12/offline_rl"
+  log_dir: "logs/p12/offline_rl"
+
+ope:
+  enabled: true
+  
+  fqe:
+    n_steps: 100000
+    learning_rate: 1.0e-4
+    batch_size: 256
+    hidden_dims: [512, 256]
+    gamma: 0.99
+    
+  wis:
+    n_trajectories: 100
+    
+  bootstrap:
+    n_bootstrap: 200
+    confidence_level: 0.95
+    
+  gate:
+    require_positive_lower_ci: true
+    require_beat_bc: true
+    
+  output_csv: "results/p12_offline_leaderboard.csv"
+
+shield:
+  enabled: true
+  use_schema_rules: true
+  projection_method: "clip"
+  max_delta_per_step: 0.08   # Tighter for coupled system
+  log_interventions: true
+  intervention_penalty: -0.02
+
+mpc:
+  enabled: true
+  
+  dynamics:
+    type: "mlp"
+    hidden_dims: [512, 256]
+    residual: true
+    
+    training:
+      n_epochs: 100
+      batch_size: 256
+      learning_rate: 5.0e-4
+      weight_decay: 1.0e-4
+      val_frac: 0.1
+      
+    model_path: "models/p12/mpc/dynamics.pt"
+    
+  cem:
+    horizon: 15           # Longer horizon for coupled
+    n_candidates: 750
+    n_elite: 75
+    n_iterations: 7
+    init_std: 0.25
+    min_std: 0.01
+
+online_eval:
+  enabled: true
+  
+  n_episodes: 30         # Fewer due to longer episodes
+  max_steps_per_episode: 7200
+  
+  use_shield: true
+  max_intervention_rate: 0.03   # Stricter for coupled
+  
+  metrics:
+    - "itae"
+    - "ise"
+    - "overshoot"
+    - "settling_time"
+    - "wear"
+    - "energy"
+    - "violations"
+    - "interventions"
+    - "latency"
+    
+  output_csv: "results/p12_nominal.csv"
+
+attack_eval:
+  enabled: true
+  
+  attacks:
+    - type: "hostile"
+      params:
+        adversary_magnitude: 0.4
+        
+    - type: "flood"
+      params:
+        flood_prob: 0.08
+        
+    - type: "bias"
+      params:
+        bias_magnitude: 0.15
+        
+    - type: "delay"
+      params:
+        delay_steps: 5
+        
+  n_episodes_per_attack: 15
+  output_csv: "results/p12_attacks.csv"
+
+cross_version:
+  enabled: true
+  versions:
+    - "p12_v1"
+    - "p12_v2"
+  output_csv: "results/p12_cross_version.csv"
+
+plots:
+  enabled: true
+  output_dir: "paper/figs"
+  format: "pdf"
+  dpi: 300
+  
+  figures:
+    - type: "ope_scatter"
+      output: "fig_p12_ope_scatter.pdf"
+      
+    - type: "latency_cdf"
+      output: "fig_p12_latency_cdf.pdf"
+      deadline_ms: 15.0
+      
+    - type: "interventions"
+      output: "fig_p12_interventions.pdf"
+
+logging:
+  level: "INFO"
+  log_to_file: true
+  log_dir: "logs/p12"
+  tensorboard: true
+  wandb:
+    enabled: false
+    project: "hai-ml"
+    entity: null
+    
+results:
+  base_dir: "results/p12"
+  save_trajectories: false
+  save_models: true
