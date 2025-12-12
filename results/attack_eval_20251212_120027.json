@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "date": "2025-12-12T11:58:57.011607",
+    "processes": [
+      "p3"
+    ],
+    "attacks": [
+      "sensor_spoofing",
+      "actuator_injection",
+      "replay_attack",
+      "dos_attack",
+      "adversarial",
+      "combined"
+    ]
+  },
+  "results": {
+    "p3": {}
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "process": "p4",
+  "version": "21.03",
+  "algorithm": "cql",
+  "epochs": 100,
+  "train_transitions": 921603,
+  "obs_dim": 2,
+  "action_dim": 9,
+  "n_episodes": 1,
+  "trained_at": "2025-12-12T00:33:01.707082"
+}

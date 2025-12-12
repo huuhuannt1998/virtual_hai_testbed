@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "date": "2025-12-12T11:50:53.824147",
+    "sample_size": 500
+  },
+  "control": {
+    "p1": {
+      "bc": {
+        "success": true,
+        "itae": 422.9952697753906,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "td3bc": {
+        "success": true,
+        "itae": 413.670166015625,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "cql": {
+        "success": true,
+        "itae": 419.1371154785156,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "iql": {
+        "success": true,
+        "itae": 421.6502380371094,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      }
+    },
+    "p2": {
+      "bc": {
+        "success": true,
+        "itae": NaN,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "td3bc": {
+        "success": true,
+        "itae": NaN,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "cql": {
+        "success": true,
+        "itae": NaN,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "iql": {
+        "success": true,
+        "itae": NaN,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      }
+    },
+    "p3": {
+      "bc": {
+        "success": true,
+        "itae": 422.9043884277344,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "td3bc": {
+        "success": true,
+        "itae": 409.093994140625,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "cql": {
+        "success": true,
+        "itae": 411.7691650390625,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "iql": {
+        "success": true,
+        "itae": 410.37689208984375,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      }
+    },
+    "p4": {
+      "bc": {
+        "success": true,
+        "itae": 386.1177978515625,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "td3bc": {
+        "success": true,
+        "itae": 374.78118896484375,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "cql": {
+        "success": true,
+        "itae": 364.45111083984375,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      },
+      "iql": {
+        "success": true,
+        "itae": 383.8150634765625,
+        "violations": 0,
+        "intervention_pct": 0.0,
+        "n_samples": 500
+      }
+    }
+  },
+  "detection": {}
+}

@@ -1,0 +1,165 @@
+{
+  "p1": {
+    "bc": {
+      "fqe_estimate": -391.6036047353994,
+      "ci_lower": -423.4788413839116,
+      "ci_upper": -359.72836808688726,
+      "realized_reward": -422.9952697753906,
+      "realized_itae": 422.9952697753906,
+      "admitted": false,
+      "threshold": -420.0
+    },
+    "td3bc": {
+      "fqe_estimate": -386.2901753701295,
+      "ci_lower": -410.9564768876626,
+      "ci_upper": -361.6238738525964,
+      "realized_reward": -413.670166015625,
+      "realized_itae": 413.670166015625,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "cql": {
+      "fqe_estimate": -380.06107765786095,
+      "ci_lower": -414.22561418120756,
+      "ci_upper": -345.89654113451434,
+      "realized_reward": -419.1371154785156,
+      "realized_itae": 419.1371154785156,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "iql": {
+      "fqe_estimate": -401.83413248313576,
+      "ci_lower": -436.0730454066148,
+      "ci_upper": -367.5952195596567,
+      "realized_reward": -421.6502380371094,
+      "realized_itae": 421.6502380371094,
+      "admitted": false,
+      "threshold": -420.0
+    }
+  },
+  "p3": {
+    "bc": {
+      "fqe_estimate": -405.599138501635,
+      "ci_lower": -441.8513380873512,
+      "ci_upper": -369.3469389159188,
+      "realized_reward": -422.9043884277344,
+      "realized_itae": 422.9043884277344,
+      "admitted": false,
+      "threshold": -420.0
+    },
+    "td3bc": {
+      "fqe_estimate": -378.3121801534888,
+      "ci_lower": -397.71507592904067,
+      "ci_upper": -358.9092843779369,
+      "realized_reward": -409.093994140625,
+      "realized_itae": 409.093994140625,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "cql": {
+      "fqe_estimate": -386.70107835792635,
+      "ci_lower": -412.50861855304123,
+      "ci_upper": -360.89353816281147,
+      "realized_reward": -411.7691650390625,
+      "realized_itae": 411.7691650390625,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "iql": {
+      "fqe_estimate": -377.8743143926275,
+      "ci_lower": -411.7624564328243,
+      "ci_upper": -343.98617235243074,
+      "realized_reward": -410.37689208984375,
+      "realized_itae": 410.37689208984375,
+      "admitted": true,
+      "threshold": -420.0
+    }
+  },
+  "p4": {
+    "bc": {
+      "fqe_estimate": -359.5640565561415,
+      "ci_lower": -388.89844871029015,
+      "ci_upper": -330.22966440199286,
+      "realized_reward": -386.1177978515625,
+      "realized_itae": 386.1177978515625,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "td3bc": {
+      "fqe_estimate": -355.2859516369126,
+      "ci_lower": -378.8643306926506,
+      "ci_upper": -331.70757258117465,
+      "realized_reward": -374.78118896484375,
+      "realized_itae": 374.78118896484375,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "cql": {
+      "fqe_estimate": -356.37281426935255,
+      "ci_lower": -386.3719240132432,
+      "ci_upper": -326.3737045254619,
+      "realized_reward": -364.45111083984375,
+      "realized_itae": 364.45111083984375,
+      "admitted": true,
+      "threshold": -420.0
+    },
+    "iql": {
+      "fqe_estimate": -356.4780117774717,
+      "ci_lower": -384.6388900642052,
+      "ci_upper": -328.3171334907382,
+      "realized_reward": -383.8150634765625,
+      "realized_itae": 383.8150634765625,
+      "admitted": true,
+      "threshold": -420.0
+    }
+  },
+  "summary": {
+    "spearman_rho": 0.9370629370629372,
+    "p_value": 6.99316495321054e-06,
+    "n_policies": 12,
+    "admission_precision": 1.0,
+    "admission_recall": 1.0,
+    "fqe_estimates": [
+      -391.6036047353994,
+      -386.2901753701295,
+      -380.06107765786095,
+      -401.83413248313576,
+      -405.599138501635,
+      -378.3121801534888,
+      -386.70107835792635,
+      -377.8743143926275,
+      -359.5640565561415,
+      -355.2859516369126,
+      -356.37281426935255,
+      -356.4780117774717
+    ],
+    "realized_values": [
+      -422.9952697753906,
+      -413.670166015625,
+      -419.1371154785156,
+      -421.6502380371094,
+      -422.9043884277344,
+      -409.093994140625,
+      -411.7691650390625,
+      -410.37689208984375,
+      -386.1177978515625,
+      -374.78118896484375,
+      -364.45111083984375,
+      -383.8150634765625
+    ],
+    "policy_names": [
+      "p1_bc",
+      "p1_td3bc",
+      "p1_cql",
+      "p1_iql",
+      "p3_bc",
+      "p3_td3bc",
+      "p3_cql",
+      "p3_iql",
+      "p4_bc",
+      "p4_td3bc",
+      "p4_cql",
+      "p4_iql"
+    ]
+  }
+}

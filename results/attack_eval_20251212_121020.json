@@ -1,0 +1,677 @@
+{
+  "metadata": {
+    "date": "2025-12-12T12:04:31.011735",
+    "processes": [
+      "p1",
+      "p2",
+      "p3",
+      "p4"
+    ],
+    "attacks": [
+      "sensor_spoofing",
+      "actuator_injection",
+      "replay_attack",
+      "dos_attack",
+      "adversarial",
+      "combined"
+    ]
+  },
+  "results": {
+    "p1": {
+      "sensor_spoofing": {
+        "success": true,
+        "attack_type": "sensor_spoofing",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.12418725617685306,
+          "recall": 0.955,
+          "f1": 0.21979286536248563,
+          "fpr": 0.7483333333333333,
+          "tp": 191,
+          "fp": 1347,
+          "fn": 9,
+          "tn": 453
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1883.5369873046875
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 305.0185546875
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "actuator_injection": {
+        "success": true,
+        "attack_type": "actuator_injection",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.09527027027027027,
+          "recall": 0.705,
+          "f1": 0.16785714285714287,
+          "fpr": 0.7438888888888889,
+          "tp": 141,
+          "fp": 1339,
+          "fn": 59,
+          "tn": 461
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1672.923828125
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 334.33050537109375
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "replay_attack": {
+        "success": true,
+        "attack_type": "replay_attack",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.09430122116689281,
+          "recall": 0.695,
+          "f1": 0.1660692951015532,
+          "fpr": 0.7416666666666667,
+          "tp": 139,
+          "fp": 1335,
+          "fn": 61,
+          "tn": 465
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1662.79296875
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 347.7496643066406
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "dos_attack": {
+        "success": true,
+        "attack_type": "dos_attack",
+        "attack_ratio": 0.05,
+        "detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.7389473684210527,
+          "tp": 0,
+          "fp": 1404,
+          "fn": 100,
+          "tn": 496
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1573.89501953125
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 328.25482177734375
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "adversarial": {
+        "success": true,
+        "attack_type": "adversarial",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.10292072322670376,
+          "recall": 0.74,
+          "f1": 0.1807081807081807,
+          "fpr": 0.7166666666666667,
+          "tp": 148,
+          "fp": 1290,
+          "fn": 52,
+          "tn": 510
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1712.1812744140625
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 362.08038330078125
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "combined": {
+        "success": true,
+        "attack_type": "combined",
+        "attack_ratio": 0.15,
+        "detection": {
+          "precision": 0.12198581560283688,
+          "recall": 0.5733333333333334,
+          "f1": 0.20116959064327486,
+          "fpr": 0.7282352941176471,
+          "tp": 172,
+          "fp": 1238,
+          "fn": 128,
+          "tn": 462
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1704.770263671875
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 318.48297119140625
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      }
+    },
+    "p2": {
+      "sensor_spoofing": {
+        "success": true,
+        "attack_type": "sensor_spoofing",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 200,
+          "tn": 1800
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "protected": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "actuator_injection": {
+        "success": true,
+        "attack_type": "actuator_injection",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 200,
+          "tn": 1800
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "protected": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "replay_attack": {
+        "success": true,
+        "attack_type": "replay_attack",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 200,
+          "tn": 1800
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "protected": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "dos_attack": {
+        "success": true,
+        "attack_type": "dos_attack",
+        "attack_ratio": 0.05,
+        "detection": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "tp": 100,
+          "fp": 0,
+          "fn": 0,
+          "tn": 1900
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "protected": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "adversarial": {
+        "success": true,
+        "attack_type": "adversarial",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 200,
+          "tn": 1800
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "protected": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "combined": {
+        "success": true,
+        "attack_type": "combined",
+        "attack_ratio": 0.15,
+        "detection": {
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5,
+          "fpr": 0.0,
+          "tp": 100,
+          "fp": 0,
+          "fn": 200,
+          "tn": 1700
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "protected": {
+          "violations": 0,
+          "itae": NaN
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      }
+    },
+    "p3": {
+      "sensor_spoofing": {
+        "success": true,
+        "attack_type": "sensor_spoofing",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.1480927449513837,
+          "recall": 0.99,
+          "f1": 0.2576447625243982,
+          "fpr": 0.6327777777777778,
+          "tp": 198,
+          "fp": 1139,
+          "fn": 2,
+          "tn": 661
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1858.48046875
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 436.1911926269531
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "actuator_injection": {
+        "success": true,
+        "attack_type": "actuator_injection",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.09444444444444444,
+          "recall": 0.595,
+          "f1": 0.16301369863013698,
+          "fpr": 0.6338888888888888,
+          "tp": 119,
+          "fp": 1141,
+          "fn": 81,
+          "tn": 659
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1648.650634765625
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 482.2377624511719
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "replay_attack": {
+        "success": true,
+        "attack_type": "replay_attack",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.10272373540856031,
+          "recall": 0.66,
+          "f1": 0.17777777777777778,
+          "fpr": 0.6405555555555555,
+          "tp": 132,
+          "fp": 1153,
+          "fn": 68,
+          "tn": 647
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1677.500244140625
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 464.23687744140625
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "dos_attack": {
+        "success": true,
+        "attack_type": "dos_attack",
+        "attack_ratio": 0.05,
+        "detection": {
+          "precision": 0.07710100231303008,
+          "recall": 1.0,
+          "f1": 0.14316392269148176,
+          "fpr": 0.63,
+          "tp": 100,
+          "fp": 1197,
+          "fn": 0,
+          "tn": 703
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1573.9569091796875
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 465.6370849609375
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "adversarial": {
+        "success": true,
+        "attack_type": "adversarial",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.09647058823529411,
+          "recall": 0.615,
+          "f1": 0.16677966101694916,
+          "fpr": 0.64,
+          "tp": 123,
+          "fp": 1152,
+          "fn": 77,
+          "tn": 648
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1661.4970703125
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 469.38677978515625
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "combined": {
+        "success": true,
+        "attack_type": "combined",
+        "attack_ratio": 0.15,
+        "detection": {
+          "precision": 0.20182094081942337,
+          "recall": 0.8866666666666667,
+          "f1": 0.3288009888751545,
+          "fpr": 0.6188235294117647,
+          "tp": 266,
+          "fp": 1052,
+          "fn": 34,
+          "tn": 648
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1676.223876953125
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 445.4962158203125
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      }
+    },
+    "p4": {
+      "sensor_spoofing": {
+        "success": true,
+        "attack_type": "sensor_spoofing",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.28440366972477066,
+          "recall": 0.62,
+          "f1": 0.3899371069182391,
+          "fpr": 0.17333333333333334,
+          "tp": 124,
+          "fp": 312,
+          "fn": 76,
+          "tn": 1488
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1685.5623779296875
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 982.4559936523438
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "actuator_injection": {
+        "success": true,
+        "attack_type": "actuator_injection",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.1111111111111111,
+          "recall": 0.185,
+          "f1": 0.13883677298311442,
+          "fpr": 0.16444444444444445,
+          "tp": 37,
+          "fp": 296,
+          "fn": 163,
+          "tn": 1504
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1486.575927734375
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 1027.4840087890625
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "replay_attack": {
+        "success": true,
+        "attack_type": "replay_attack",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.08598726114649681,
+          "recall": 0.135,
+          "f1": 0.10505836575875487,
+          "fpr": 0.15944444444444444,
+          "tp": 27,
+          "fp": 287,
+          "fn": 173,
+          "tn": 1513
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1471.350830078125
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 1024.63037109375
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "dos_attack": {
+        "success": true,
+        "attack_type": "dos_attack",
+        "attack_ratio": 0.05,
+        "detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.15947368421052632,
+          "tp": 0,
+          "fp": 303,
+          "fn": 100,
+          "tn": 1597
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1409.80126953125
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 950.9197998046875
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "adversarial": {
+        "success": true,
+        "attack_type": "adversarial",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.1327683615819209,
+          "recall": 0.235,
+          "f1": 0.16967509025270758,
+          "fpr": 0.17055555555555554,
+          "tp": 47,
+          "fp": 307,
+          "fn": 153,
+          "tn": 1493
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1491.72265625
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 1020.9337158203125
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      },
+      "combined": {
+        "success": true,
+        "attack_type": "combined",
+        "attack_ratio": 0.15,
+        "detection": {
+          "precision": 0.2493150684931507,
+          "recall": 0.30333333333333334,
+          "f1": 0.2736842105263158,
+          "fpr": 0.16117647058823528,
+          "tp": 91,
+          "fp": 274,
+          "fn": 209,
+          "tn": 1426
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1497.1728515625
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 951.494873046875
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      }
+    }
+  }
+}

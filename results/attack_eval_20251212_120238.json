@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "date": "2025-12-12T12:02:18.368235",
+    "processes": [
+      "p3"
+    ],
+    "attacks": [
+      "sensor_spoofing"
+    ]
+  },
+  "results": {
+    "p3": {
+      "sensor_spoofing": {
+        "success": true,
+        "attack_type": "sensor_spoofing",
+        "attack_ratio": 0.1,
+        "detection": {
+          "precision": 0.1485884101040119,
+          "recall": 1.0,
+          "f1": 0.258732212160414,
+          "fpr": 0.6366666666666667,
+          "tp": 200,
+          "fp": 1146,
+          "fn": 0,
+          "tn": 654
+        },
+        "baseline": {
+          "violations": 0,
+          "itae": 1848.8447265625
+        },
+        "protected": {
+          "violations": 0,
+          "itae": 428.1180725097656
+        },
+        "improvement": {
+          "violation_reduction": 0,
+          "violation_reduction_pct": 0.0
+        }
+      }
+    }
+  }
+}

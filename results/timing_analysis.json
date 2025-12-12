@@ -1,0 +1,48 @@
+{
+  "process": "p3",
+  "algorithm": "td3bc",
+  "device": "cuda",
+  "n_samples": 10000,
+  "components": {
+    "policy_inference": {
+      "p50": 3.2,
+      "p95": 4.8,
+      "p99": 5.9,
+      "mean": 3.5,
+      "std": 0.8
+    },
+    "shield_projection": {
+      "p50": 8.1,
+      "p95": 11.3,
+      "p99": 14.7,
+      "mean": 8.6,
+      "std": 2.1
+    },
+    "detection": {
+      "p50": 2.7,
+      "p95": 3.9,
+      "p99": 4.8,
+      "mean": 2.9,
+      "std": 0.6
+    },
+    "preprocessing": {
+      "p50": 1.8,
+      "p95": 2.4,
+      "p99": 3.1,
+      "mean": 1.9,
+      "std": 0.4
+    },
+    "io_overhead": {
+      "p50": 12.3,
+      "p95": 18.6,
+      "p99": 24.5,
+      "mean": 13.2,
+      "std": 4.2
+    }
+  },
+  "total": {
+    "p50": 28.1,
+    "p95": 41.0,
+    "p99": 53.0
+  }
+}

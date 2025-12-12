@@ -1,0 +1,10 @@
+{
+  "process": "p4",
+  "version": "21.03",
+  "epochs": 50,
+  "train_samples": 921603,
+  "train_attack_samples": 0,
+  "input_dim": 2,
+  "ae_threshold": 3.6278711377235595e-06,
+  "trained_at": "2025-12-12T01:48:49.513654"
+}

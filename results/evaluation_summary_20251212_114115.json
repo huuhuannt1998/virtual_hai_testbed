@@ -1,0 +1,154 @@
+{
+  "p1_control": {
+    "bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 8,
+      "action_dim": 5
+    },
+    "td3bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 8,
+      "action_dim": 5
+    },
+    "cql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 8,
+      "action_dim": 5
+    },
+    "iql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 8,
+      "action_dim": 5
+    }
+  },
+  "p1_detection": {
+    "train_samples": 921603,
+    "attack_samples": 0,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": null
+  },
+  "p2_control": {
+    "bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    },
+    "td3bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    },
+    "cql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    },
+    "iql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    }
+  },
+  "p2_detection": {
+    "train_samples": 921603,
+    "attack_samples": 0,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": null
+  },
+  "p3_control": {
+    "bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    },
+    "td3bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    },
+    "cql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    },
+    "iql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 3,
+      "action_dim": 2
+    }
+  },
+  "p3_detection": {
+    "train_samples": 921603,
+    "attack_samples": 0,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": null
+  },
+  "p4_control": {
+    "bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 2,
+      "action_dim": 9
+    },
+    "td3bc": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 2,
+      "action_dim": 9
+    },
+    "cql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 2,
+      "action_dim": 9
+    },
+    "iql": {
+      "trained": true,
+      "train_transitions": 921603,
+      "epochs": 100,
+      "obs_dim": 2,
+      "action_dim": 9
+    }
+  },
+  "p4_detection": {
+    "train_samples": 921603,
+    "attack_samples": 0,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": null
+  }
+}

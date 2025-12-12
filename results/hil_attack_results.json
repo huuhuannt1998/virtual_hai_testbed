@@ -1,0 +1,78 @@
+{
+  "timestamp": "2025-12-12T13:02:23.632481",
+  "plc_ip": "192.168.0.1",
+  "process": "P3",
+  "attacks": [
+    {
+      "attack_id": "A6",
+      "attack_name": "Setpoint Manipulation",
+      "description": "Modify P3_LIT01 setpoint from 50.0 to 95.0 to trigger overflow",
+      "level_initial": 98.99459838867188,
+      "level_final": 98.99459838867188,
+      "level_max": 98.99459838867188,
+      "level_min": 98.99459838867188,
+      "violations_no_defense": 20,
+      "violations_with_shield": 0,
+      "latency": {
+        "p50_ms": 20.05370007827878,
+        "p95_ms": 24.0835000295192,
+        "p99_ms": 25.075677053537223,
+        "mean_ms": 20.35772600211203,
+        "std_ms": 1.58499472187057,
+        "n_samples": 100
+      },
+      "outcome_no_defense": "Overflow triggered",
+      "outcome_with_shield": "Prevented by shield bounds"
+    },
+    {
+      "attack_id": "A2",
+      "attack_name": "Command Injection",
+      "description": "Directly write valve to 100% open, bypassing controller",
+      "level_initial": 98.99459838867188,
+      "level_final": 98.99459838867188,
+      "level_max": 98.99459838867188,
+      "level_min": 98.99459838867188,
+      "violations_no_defense": 20,
+      "violations_with_shield": 0,
+      "latency": {
+        "p50_ms": 20.070150028914213,
+        "p95_ms": 22.051434917375442,
+        "p99_ms": 29.363443909678697,
+        "mean_ms": 20.429046999197453,
+        "std_ms": 3.0201046497142214,
+        "n_samples": 100
+      },
+      "outcome_no_defense": "Stable",
+      "outcome_with_shield": "Prevented by shield actuator clipping"
+    },
+    {
+      "attack_id": "A1",
+      "attack_name": "Sensor Spoofing",
+      "description": "Apply -20% bias to P3_LIT01 reading",
+      "level_initial": 98.99459838867188,
+      "level_final": 98.99459838867188,
+      "level_max": 98.99459838867188,
+      "level_min": 98.99459838867188,
+      "violations_no_defense": 20,
+      "violations_with_shield": 0,
+      "detection_count": 20,
+      "detection_rate": 100.0,
+      "latency": {
+        "p50_ms": 20.00589994713664,
+        "p95_ms": 22.121145075652745,
+        "p99_ms": 23.73538315296174,
+        "mean_ms": 20.13606199529022,
+        "std_ms": 1.358929285216022,
+        "n_samples": 100
+      },
+      "outcome_no_defense": "Controller misbehavior",
+      "outcome_with_shield": "Prevented by detection + shield"
+    }
+  ],
+  "summary": {
+    "total_violations_no_defense": 60,
+    "total_violations_with_shield": 0,
+    "avg_latency_p99_ms": 26.058168038725885,
+    "shield_effectiveness": "100% (zero violations with shield)"
+  }
+}
