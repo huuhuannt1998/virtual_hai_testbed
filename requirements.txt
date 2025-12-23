@@ -1,6 +1,10 @@
 # PLC communication
 python-snap7>=1.1.0
 
+# LLM Red Team Agent dependencies
+requests>=2.31
+python-dotenv>=1.0
+
 # Core ML dependencies
 torch>=2.2
 numpy>=1.26

@@ -126,6 +126,7 @@ NON_RETAIN
       // =====================================================================
       // P3: WATER TREATMENT PROCESS (Siemens S7-300 style)
       // Offsets 272-296 (7 tags × 4 bytes = 28 bytes)
+      // Note: LH01/LL01 correspond to HAI dataset P3_LH/P3_LL thresholds
       // =====================================================================
       
       // Flow Indicator Transmitter
@@ -137,7 +138,7 @@ NON_RETAIN
       // Level Control Valve
       P3_LCV01D : Real := 0.0;    // Level control valve demand [%]
       
-      // Level Thresholds
+      // Level Thresholds (HAI dataset: P3_LH and P3_LL)
       P3_LH01 : Real := 80.0;     // High level threshold [%]
       P3_LL01 : Real := 20.0;     // Low level threshold [%]
       

@@ -26,7 +26,6 @@ VAR
     SC_Kp : Real := 0.5;
     SC_Ki : Real := 0.02;
     TripLatch : Bool := FALSE;
-    HighVib_Limit : Real := 10.0;
 END_VAR
 
 VAR_TEMP
@@ -34,7 +33,10 @@ VAR_TEMP
     SC_Out : Real;
     OverspeedTrip : Bool;
     VibrationTrip : Bool;
-    AvgVibration : Real;
+    Vib1Trip : Bool;
+    Vib2Trip : Bool;
+    Vib3Trip : Bool;
+    Vib4Trip : Bool;
 END_VAR
 
 BEGIN
@@ -44,12 +46,18 @@ BEGIN
     // ========================================================================
     
     // Overspeed check using RTR threshold
+    // Check both speed sensors for redundancy (SIT01 is primary)
     #OverspeedTrip := ("DB_HAI".P2_SIT01 > "DB_HAI".P2_RTR);
     
-    // Average vibration from 4 sensors
-    #AvgVibration := ("DB_HAI".P2_VIBTR01 + "DB_HAI".P2_VIBTR02 + 
-                      "DB_HAI".P2_VIBTR03 + "DB_HAI".P2_VIBTR04) / 4.0;
-    #VibrationTrip := (#AvgVibration > #HighVib_Limit);
+    // Individual vibration sensor trip checks against their thresholds (VTR01-04)
+    // Each sensor has its own configurable trip threshold
+    #Vib1Trip := ("DB_HAI".P2_VIBTR01 > "DB_HAI".P2_VTR01);
+    #Vib2Trip := ("DB_HAI".P2_VIBTR02 > "DB_HAI".P2_VTR02);
+    #Vib3Trip := ("DB_HAI".P2_VIBTR03 > "DB_HAI".P2_VTR03);
+    #Vib4Trip := ("DB_HAI".P2_VIBTR04 > "DB_HAI".P2_VTR04);
+    
+    // Trip if ANY vibration sensor exceeds its threshold (voting: 1oo4)
+    #VibrationTrip := #Vib1Trip OR #Vib2Trip OR #Vib3Trip OR #Vib4Trip;
     
     // Latch trip
     IF #OverspeedTrip OR #VibrationTrip THEN

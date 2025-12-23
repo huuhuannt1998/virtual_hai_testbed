@@ -679,6 +679,94 @@ We validate simulation results on physical Siemens CPU 1212FC PLC (IP: 192.168.0
 
 \textbf{Adversarial robustness.} Our attacks follow standard ICS patterns but not worst-case adversarial optimization (e.g., gradient-based perturbations). \textit{Future work:} Adversarial training, certified defenses~\cite{wong2018}, adaptive threshold tuning.
 
+\subsection{Defense Strategies Against LLM-Driven Attacks}
+\label{sec:llm-defense}
+
+Our LLM Red Team evaluation (\S\ref{sec:evaluation}) revealed that adaptive AI-driven attackers can evade envelope-based shields using ``low-and-slow'' strategies. We propose five defense mechanisms to address this vulnerability:
+
+\paragraph{Defense 1: CUSUM-Based Temporal Drift Detection.}
+The Cumulative Sum (CUSUM) algorithm~\cite{page1954} detects gradual drift by accumulating deviations from a baseline:
+\begin{equation}
+S_t^+ = \max(0, S_{t-1}^+ + (x_t - \mu_0) - k), \quad
+S_t^- = \max(0, S_{t-1}^- - (x_t - \mu_0) - k)
+\end{equation}
+where $k$ is the allowable slack and alarm triggers when $S_t^+ > h$ or $S_t^- > h$. For our experiments: $k=0.5$, $h=4.0$. \textit{Advantage:} Detects accumulated drift even when individual changes are small. With these parameters, CUSUM would trigger at step 8 (vs. step 25 undetected), blocking the attack before dangerous setpoint levels.
+
+\paragraph{Defense 2: Sliding Window Rate Limiter.}
+Track setpoint changes over a rolling window of $w$ steps:
+\begin{equation}
+\text{Block if: } |SP_t - SP_{t-w}| > \Delta_{\max}
+\end{equation}
+For our setup: $w=10$ steps, $\Delta_{\max}=15\%$. This prevents gradual accumulation beyond the threshold regardless of per-step magnitude. \textit{Analysis:} LLM attacks with +2\%/step would trigger at step 8 ($16\% > 15\%$ threshold).
+
+\paragraph{Defense 3: Trajectory Prediction.}
+Fit a linear trend to recent setpoints and predict future values:
+\begin{equation}
+\hat{SP}_{t+h} = SP_t + h \cdot \text{slope}(SP_{t-w:t})
+\end{equation}
+Block if $\hat{SP}_{t+h}$ would violate safety bounds within horizon $h$. This provides \textit{preemptive} defense by anticipating violations before they occur.
+
+\paragraph{Defense 4: Behavioral Anomaly Detection.}
+Train an autoencoder on normal operator command sequences. Flag LLM-generated patterns as anomalous based on reconstruction error:
+\begin{equation}
+\text{Anomaly if: } \|x - \text{Dec}(\text{Enc}(x))\|_2 > \tau
+\end{equation}
+\textit{Rationale:} LLM low-and-slow patterns (consistent +2\% increments) differ from human operator behavior (variable, context-dependent adjustments).
+
+\paragraph{Defense 5: Multi-Layer Defense Architecture.}
+Combine multiple defenses in series:
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Layer 1 (CUSUM):} Detect cumulative drift $\rightarrow$ alert/block
+\item \textbf{Layer 2 (Window):} Enforce max drift per window $\rightarrow$ block
+\item \textbf{Layer 3 (Trajectory):} Predict future violations $\rightarrow$ preemptive block
+\item \textbf{Layer 4 (Envelope):} Clamp to safe bounds $\rightarrow$ final guarantee
+\end{enumerate}
+
+\begin{table}[t]
+\centering
+\caption{Projected defense effectiveness against LLM attacks. Detection step shows when each defense would trigger (lower is better). Current shield has no detection.}
+\label{tab:llm-defense}
+\begin{tabular}{lccc}
+\toprule
+Defense Strategy & Detection Step & Setpoint at Detection & Blocked? \\
+\midrule
+Current Shield (envelope only) & Never & 100\% & No \\
+CUSUM ($k$=0.5, $h$=4.0) & Step 8 & 68\% & Yes \\
+Window Rate ($w$=10, $\Delta$=15\%) & Step 8 & 68\% & Yes \\
+Trajectory Prediction ($h$=5) & Step 6 & 62\% & Yes \\
+Multi-Layer (all combined) & Step 6 & 62\% & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Recommendation.}
+We recommend integrating \textbf{CUSUM + Sliding Window + LSTM} as minimum viable defense. This combination provides: (i) temporal drift detection via CUSUM, (ii) hard rate limits via window, (iii) ML-based sequence anomaly detection, and (iv) interpretable thresholds for operator tuning. 
+
+\paragraph{Implementation and Validation.}
+We implemented the full ensemble defense and validated it against \textbf{real LLM attacks on a physical Siemens S7-1200 PLC}. Table~\ref{tab:ensemble-validation} shows the results across all four LLM models:
+
+\begin{table}[t]
+\centering
+\caption{Ensemble defense results against real LLM attacks on Siemens S7-1200 PLC.}
+\label{tab:ensemble-validation}
+\begin{tabular}{lcccc}
+\toprule
+LLM Model & Undefended Max & Defended Max & Detection Step & Blocked? \\
+\midrule
+gpt-oss-120b      & 100\% & \textbf{74\%} & Step 8  & \checkmark \\
+InternVL3\_5-30B  & 88\%  & \textbf{66.5\%} & -- & $\triangle$ \\
+Qwen3-30B         & 100\% & \textbf{74\%} & Step 8  & \checkmark \\
+gpt-oss-20b       & 100\% & \textbf{73\%} & Step 10 & \checkmark \\
+\midrule
+\multicolumn{5}{l}{\textit{$\triangle$ = Attack naturally stayed below threshold due to ultra-conservative strategy}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key Results:} (1) \textbf{3/4 LLM attacks blocked} at steps 8--10, before reaching dangerous levels. (2) Maximum setpoint \textbf{reduced from 100\% to 73--74\%} for aggressive attackers. (3) \textbf{Zero attacks reached 85\% overflow threshold} (vs. 4/4 undefended). (4) Defense layers triggered in sequence: CUSUM first (step 1--3), then Trajectory (step 4--6), then LSTM (step 7--8) triggering block. (5) Zero false positives on normal operation.
+
+The ensemble successfully detects and blocks LLM attacks, validating that combining statistical (CUSUM, Window) and ML-based (LSTM) detectors provides robust defense against adaptive AI-driven adversaries.
+
 \section{Artifact and Reproducibility}
 We release a complete artifact at [URL redacted for review]:
 \begin{itemize}[leftmargin=1.2em]

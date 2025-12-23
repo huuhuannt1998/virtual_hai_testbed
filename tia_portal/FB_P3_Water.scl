@@ -24,7 +24,6 @@ VAR
     LC_Integral : Real := 0.0;
     LC_Kp : Real := 2.5;
     LC_Ki : Real := 0.15;
-    Level_SP : Real := 50.0;
 END_VAR
 
 VAR_TEMP
@@ -32,6 +31,7 @@ VAR_TEMP
     LC_Out : Real;
     LevelLow : Bool;
     LevelHigh : Bool;
+    Level_SP : Real;  // Computed from LH and LL thresholds
 END_VAR
 
 BEGIN
@@ -43,6 +43,13 @@ BEGIN
     IF #Reset THEN
         #LC_Integral := 0.0;
     END_IF;
+    
+    // ========================================================================
+    // LEVEL SETPOINT CALCULATION
+    // Setpoint is midpoint between low (LL01) and high (LH01) thresholds
+    // ========================================================================
+    
+    #Level_SP := ("DB_HAI".P3_LH01 + "DB_HAI".P3_LL01) / 2.0;
     
     // ========================================================================
     // LEVEL ALARMS

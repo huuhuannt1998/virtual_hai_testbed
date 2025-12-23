@@ -1,0 +1,11 @@
+{
+  "timestamp": "20251222_191104",
+  "config": {
+    "cusum_k": 0.5,
+    "cusum_h": 4.0,
+    "window_size": 10,
+    "max_drift": 15.0,
+    "vote_threshold": 0.4
+  },
+  "results": []
+}
